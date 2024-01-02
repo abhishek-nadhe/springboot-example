@@ -5,7 +5,14 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
+    
+env:
+  AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  PRIVATE_SSH_KEY: ${{ secrets.AWS_KAMP_EC2_IP }}
+  SERVER_PUBLIC_IP: ${{ secrets.AWS_PUBLIC_KEY }}
+  
 jobs:
   build:
     runs-on: [ubuntu-latest]
@@ -58,5 +65,6 @@ jobs:
           username: ${{ secrets.AWS_KAMP_EC2_USER }}
           key: ${{ secrets.PRIVATE_KEY_PEM }}
           script: |
-            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+            sudo $(aws ecr get-login --no-include-email --region us-east-1);
+            sudo docker pull ${{ secrets.ECR_REPO_URL }}:springboot-latest
             docker run -d -p 8080:8080 --name springboot-latest ${{ secrets.ECR_REPO_URL }}:springboot-latest
