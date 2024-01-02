@@ -30,10 +30,9 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: kampdevecr
           IMAGE_TAG: springbootapplication
-      - name: Build docker image
-        run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-      - name: Publish image to ECR hub
-        run: docker push integrationninjas/springboot-example:latest
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push integrationninjas/springboot-example:latest
   deploy:
     needs: build
     runs-on: [ubuntu-latest]
