@@ -41,12 +41,6 @@ jobs:
     needs: build
     runs-on: [ubuntu-latest]
     steps:
-      - name: Delete stop old container
-        run: docker rm springboot-latest
-      - name: Delete old container
-        run: docker rm springboot-latest
-      # - name: Remove container image
-      #   run: dhfbsdh
       - name: Pull Image from ECR
         run: docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/kampdevecr:springboot-latest
       - name: SSH into EC2 and Deploy
