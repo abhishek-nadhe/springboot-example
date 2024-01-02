@@ -23,7 +23,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
         with:
           registries: ${{ secrets.ECR_REPO_URL }}
-          region: ${{ secrets.AWS_DEFAULT_REGION }}
+          # region: ${{ secrets.AWS_DEFAULT_REGION }}
       - name: Build docker image
         run: docker build -t integrationninjas/springboot-example .
       - name: Publish image to docker hub
