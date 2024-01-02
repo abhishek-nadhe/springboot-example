@@ -20,7 +20,7 @@ jobs:
       - name: Build Project
         run: mvn clean install -DskipTests
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -42,7 +42,7 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -52,10 +52,12 @@ jobs:
       - name: Pull Image from ECR
         run: docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/kampdevecr:springboot-latest
       - name: SSH into EC2 and Deploy
+        env: 
+          ECR_REPO_URL: ${{ secrets.ECR_REPO_URL }}
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AWS_KAMP_EC2_IP }}
           username: ${{ secrets.AWS_KAMP_EC2_USER }}
           key: ${{ secrets.PRIVATE_KEY_PEM }}
           script: |
-            docker run -d -p 8080:8080 --name springboot-latest ${{ secrets.ECR_REPO_URL }}:springboot-latest
+            docker run -d -p 8080:8080 --name springboot-latest $ECR_REPO_URL:springboot-latest
