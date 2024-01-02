@@ -19,12 +19,12 @@ jobs:
           java-version: '17'
       - name: Build Project
         run: mvn clean install -DskipTests
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
       - name: Login to Amazon ECR
         run: aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin .dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
       - name: Build, tag, and push image to Amazon ECR
@@ -34,7 +34,8 @@ jobs:
         #   IMAGE_TAG: springbootapplication
         run: |
           echo "ECR Registry: $ECR_REGISTRY/$ECR_REPOSITORY"
-          docker build -t ${{ secrets.ECR_REPO_URL }}:springboot-latest
+          docker build -t kampdevecr .
+          docker tag kampdevecr:latest ${{ secrets.ECR_REPO_URL }}:springboot-latest
           docker push ${{ secrets.ECR_REPO_URL }}:springboot-latest
   deploy:
     needs: build
