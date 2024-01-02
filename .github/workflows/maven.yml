@@ -25,15 +25,17 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+      - name: Login to Amazon ECR
+        run: aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin .dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
       - name: Build, tag, and push image to Amazon ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: kampdevecr
-          IMAGE_TAG: springbootapplication
+        # env:
+        #   ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        #   ECR_REPOSITORY: kampdevecr
+        #   IMAGE_TAG: springbootapplication
         run: |
           echo "ECR Registry: $ECR_REGISTRY/$ECR_REPOSITORY"
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY .
-          docker push integrationninjas/springboot-example
+          docker build -t ${{ secrets.ECR_REPO_URL }}:springboot-latest
+          docker push ${{ secrets.ECR_REPO_URL }}:springboot-latest
   deploy:
     needs: build
     runs-on: [ubuntu-latest]
