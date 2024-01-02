@@ -60,4 +60,4 @@ jobs:
           username: ${{ secrets.AWS_KAMP_EC2_USER }}
           key: ${{ secrets.PRIVATE_KEY_PEM }}
           script: |
-            docker run -d -p 8080:8080 --name springboot-latest $ECR_REPO_URL:springboot-latest
+            docker run -d -p 8080:8080 --name springboot-latest ${{ secrets.ECR_REPO_URL }}:springboot-latest
