@@ -65,5 +65,7 @@ jobs:
             aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws configure set default.region ${{ secrets.AWS_DEFAULT_REGION }}
+            # Authenticate Docker with ECR
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
             docker pull ${{ secrets.ECR_REPO_URL }}:springboot-latest
             docker run -d -p 8080:8080 --name springboot-latest ${{ secrets.ECR_REPO_URL }}:springboot-latest
