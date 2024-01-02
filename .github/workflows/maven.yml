@@ -31,8 +31,9 @@ jobs:
           ECR_REPOSITORY: kampdevecr
           IMAGE_TAG: springbootapplication
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push integrationninjas/springboot-example:latest
+          echo "ECR Registry: $ECR_REGISTRY/$ECR_REPOSITORY"
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY .
+          docker push integrationninjas/springboot-example
   deploy:
     needs: build
     runs-on: [ubuntu-latest]
