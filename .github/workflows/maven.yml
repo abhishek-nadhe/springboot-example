@@ -41,12 +41,14 @@ jobs:
     needs: build
     runs-on: [ubuntu-latest]
     steps:
-      - name: Pull Image from ECR
-        run: docker pull integrationninjas/springboot-example:latest
+      - name: Delete stop old container
+        run: docker rm springboot-latest
       - name: Delete old container
-        run: docker rm -f springboot-example-container
-      - name: Run docker container
-        run: docker run -d -p 8080:8080 --name springboot-example-container integrationninjas/springboot-example
+        run: docker rm springboot-latest
+      # - name: Remove container image
+      #   run: dhfbsdh
+      - name: Pull Image from ECR
+        run: docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/kampdevecr:springboot-latest
       - name: SSH into EC2 and Deploy
         uses: appleboy/ssh-action@master
         with:
@@ -54,4 +56,4 @@ jobs:
           username: ${{ secrets.AWS_KAMP_EC2_USER }}
           key: ${{ secrets.PRIVATE_KEY_PEM }}
           script: |
-            docker run -d -p 8080:8080 --name springboot-example-container integrationninjas/springboot-example
+            docker run -d -p 8080:8080 --name springboot-latest ${{ secrets.ECR_REPO_URL }}:springboot-latest
