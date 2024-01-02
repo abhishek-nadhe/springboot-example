@@ -22,7 +22,7 @@ jobs:
       - name: Amazon ECR "Login" Action for GitHub Actions
         uses: aws-actions/amazon-ecr-login@v2
         with:
-          registry: ${{ secrets.ECR_REPO_URL }}
+          registries: ${{ secrets.ECR_REPO_URL }}
           region: ${{ secrets.AWS_DEFAULT_REGION }}
       - name: Build docker image
         run: docker build -t integrationninjas/springboot-example .
