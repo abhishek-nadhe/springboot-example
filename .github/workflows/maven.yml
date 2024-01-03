@@ -34,12 +34,12 @@ jobs:
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
       - name: Login to Amazon ECR
         run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
-      - name: Build, tag, and push image to Amazon ECR
-        run: |
-          echo "ECR Registry: $ECR_REGISTRY/$ECR_REPOSITORY"
-          docker build -t kampdevecr .
-          docker tag kampdevecr:latest ${{ secrets.ECR_REPO_URL }}:springboot-latest
-          docker push ${{ secrets.ECR_REPO_URL }}:springboot-latest
+      # - name: Build, tag, and push image to Amazon ECR
+      #   run: |
+      #     echo "ECR Registry: $ECR_REGISTRY/$ECR_REPOSITORY"
+      #     docker build -t kampdevecr .
+      #     docker tag kampdevecr:latest ${{ secrets.ECR_REPO_URL }}:springboot-latest
+      #     docker push ${{ secrets.ECR_REPO_URL }}:springboot-latest
       - name: Build and Upload Docker Image
         run: |
             ls
