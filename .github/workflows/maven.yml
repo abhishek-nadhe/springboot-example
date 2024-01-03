@@ -56,7 +56,7 @@ jobs:
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
       - name: Get Image from S3 bucket and push it to ECR 
         run: |
-            sh ./push-to-ecr.sh
+            sh ./push_to_ecr.sh
         shell: bash
       # - name: Login to Amaszon ECR
       #   run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
