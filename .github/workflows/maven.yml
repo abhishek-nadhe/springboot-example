@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: [ "master" ]
   workflow_dispatch:
-      inputs:
-        environment:
-          description: 'Environment to deploy to'
-          required: true
     
 # env:
 #   AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
@@ -59,7 +55,7 @@ jobs:
   deploy:
     needs: build
     runs-on: [ubuntu-latest]
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev'
+    if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -89,7 +85,7 @@ jobs:
   deploy-from-s3-bucket:
     needs: build
     runs-on: [ubuntu-latest]
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev'
+    if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
