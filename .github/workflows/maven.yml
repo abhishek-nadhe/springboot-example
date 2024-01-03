@@ -53,7 +53,7 @@ jobs:
       #       echo "Docker image has been pushed to ECR successfully!"
       #   shell: bash
   deploy:
-    # needs: build
+    needs: build
     runs-on: [ubuntu-latest]
     if: github.event_name == 'workflow_dispatch'
     steps:
@@ -91,7 +91,7 @@ jobs:
                 docker rm springboot-latest
     
                 echo "Removing existing image"
-                docker rmi {ECR-REPO-URL}:springboot-latest
+                docker rmi ${{ secrets.ECR_REPO_URL }}:springboot-latest
             fi
 
             aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -102,7 +102,7 @@ jobs:
             docker pull ${{ secrets.ECR_REPO_URL }}:springboot-latest
             docker run -d -p 8080:8080 --name springboot-latest ${{ secrets.ECR_REPO_URL }}:springboot-latest
   deploy-from-s3-bucket:
-    # needs: build
+    needs: build
     runs-on: [ubuntu-latest]
     if: github.event_name == 'workflow_dispatch'
     steps:
@@ -147,7 +147,7 @@ jobs:
                 docker rm springboot-latest123
     
                 echo "Removing existing image"
-                docker rmi {ECR-REPO-URL}:springboot-latest123
+                docker rmi ${{ secrets.ECR_REPO_URL }}:springboot-latest123
             fi
             aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
