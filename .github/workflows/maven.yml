@@ -1,10 +1,10 @@
 name: Java CICD
 
 on:
-  # push:
-  #   branches: [ "master" ]
-  # pull_request:
-  #   branches: [ "master" ]
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
   workflow_dispatch:
     
 # env:
@@ -157,4 +157,3 @@ jobs:
             docker pull ${{ secrets.ECR_REPO_URL }}:springboot-latest123
             docker run -d -p 8080:8080 --name springboot-latest123 ${{ secrets.ECR_REPO_URL }}:springboot-latest123
 
-            
