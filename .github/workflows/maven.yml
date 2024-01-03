@@ -42,10 +42,9 @@ jobs:
           docker push ${{ secrets.ECR_REPO_URL }}:springboot-latest
       - name: Build and Upload Docker Image
         run: |
-            echo '#!/bin/bash' > build_and_upload.sh
-            echo 'chmod +x .github/scripts/build_and_upload.sh' >> build_and_upload.sh
-            echo '(cd .github/scripts && ./build_and_upload.sh)' >> build_and_upload.sh
-            bash build_and_upload.sh
+            ls
+            cd .github/scripts
+            sh build_and_upload.sh
         shell: bash
   deploy:
     needs: build
