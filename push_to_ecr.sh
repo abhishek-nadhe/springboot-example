@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 # Configure AWS credentials
 aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
 aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
@@ -23,14 +24,14 @@ docker load -i "${GITHUB_WORKSPACE}/${DOCKER_IMAGE_NAME}.tar.gz"
 
 echo "Loaded image ID: $(docker images -q ${DOCKER_IMAGE_NAME}:latest)"
 
-aws ecr get-login-password --region "${ECR_REGION}" | docker login --username AWS --password-stdin "${ECR_ACCOUNT_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com"
+# aws ecr get-login-password --region "${ECR_REGION}" | docker login --username AWS --password-stdin "${ECR_ACCOUNT_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com"
 
-ECR_REPOSITORY_URI="${ECR_ACCOUNT_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME}"
+# ECR_REPOSITORY_URI="${ECR_ACCOUNT_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME}"
 
-docker tag "${DOCKER_IMAGE_NAME}:latest" "${ECR_REPOSITORY_URI}:${ECR_TAG}"
+# docker tag "${DOCKER_IMAGE_NAME}:latest" "${ECR_REPOSITORY_URI}:${ECR_TAG}"
 
-docker push "${ECR_REPOSITORY_URI}:${ECR_TAG}"
+# docker push "${ECR_REPOSITORY_URI}:${ECR_TAG}"
 
-docker rmi "${DOCKER_IMAGE_NAME}:latest"
+# docker rmi "${DOCKER_IMAGE_NAME}:latest"
 
-echo "Docker image ${DOCKER_IMAGE_NAME} has been pushed to ECR successfully!"
+# echo "Docker image ${DOCKER_IMAGE_NAME} has been pushed to ECR successfully!"
