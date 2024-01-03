@@ -22,7 +22,7 @@ aws s3 cp "s3://${S3_BUCKET}/${S3_PATH}/${DOCKER_IMAGE_NAME}.tar.gz" "${GITHUB_W
 #Load the Docker image
 docker load -i "${GITHUB_WORKSPACE}/${DOCKER_IMAGE_NAME}.tar.gz"
 
-echo "Loaded image ID: $(docker images -q ${DOCKER_IMAGE_NAME}:latest)"
+# echo "Loaded image ID: $(docker images -q ${DOCKER_IMAGE_NAME}:latest)"
 
 # aws ecr get-login-password --region "${ECR_REGION}" | docker login --username AWS --password-stdin "${ECR_ACCOUNT_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com"
 
