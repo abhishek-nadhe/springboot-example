@@ -57,7 +57,7 @@ jobs:
       - name: Get Image from S3 bucket and push it to ECR 
         run: |
             ls
-            cd .github/scripts
+            cd ./.github/scripts
             sh push-to-ecr.sh
         shell: bash
       # - name: Login to Amazon ECR
