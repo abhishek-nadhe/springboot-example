@@ -25,9 +25,11 @@ echo "Loaded image ID: $(docker images -q ${DOCKER_IMAGE_NAME}:latest)"
 
 aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
 
-docker tag "${DOCKER_IMAGE_NAME}:latest" "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/${ECR_REPOSITORY_NAME}:${ECR_TAG}"
+# docker tag "${DOCKER_IMAGE_NAME}:latest" "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/${ECR_REPOSITORY_NAME}:${ECR_TAG}"
+docker tag kampdevecr:latest ${ECR_REPO_URL}:springboot-latest
 
-docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/${ECR_REPOSITORY_NAME}:${ECR_TAG}"
+# docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/${ECR_REPOSITORY_NAME}:${ECR_TAG}"
+docker push ${ECR_REPO_URL}:springboot-latest
 
 docker rmi "${DOCKER_IMAGE_NAME}:latest"
 
