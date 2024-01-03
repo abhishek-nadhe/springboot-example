@@ -43,8 +43,7 @@ jobs:
       - name: Build and Upload Docker Image
         run: |
             ls
-            cd .github/scripts
-            sh build_and_upload.sh
+            sh ./build_and_upload.sh
         shell: bash
   deploy:
     needs: build
