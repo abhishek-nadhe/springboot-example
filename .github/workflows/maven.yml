@@ -1,10 +1,10 @@
 name: Java CICD
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  # push:
+  #   branches: [ "master" ]
+  # pull_request:
+  #   branches: [ "master" ]
   workflow_dispatch:
     
 # env:
@@ -57,6 +57,13 @@ jobs:
     runs-on: [ubuntu-latest]
     if: github.event_name == 'workflow_dispatch'
     steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -99,6 +106,13 @@ jobs:
     runs-on: [ubuntu-latest]
     if: github.event_name == 'workflow_dispatch'
     steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
