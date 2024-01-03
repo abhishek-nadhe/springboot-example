@@ -54,12 +54,14 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+      - name: Login to Amaszon ECR
+        run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+      - name: Set Execute Permissions
+        run: chmod +x push_to_ecr.sh
       - name: Get Image from S3 bucket and push it to ECR 
         run: |
             sh ./push_to_ecr.sh
         shell: bash
-      # - name: Login to Amaszon ECR
-      #   run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
       - name: SSH into EC2 and Deploy
         env: 
           ECR_REPO_URL: ${{ secrets.ECR_REPO_URL }}
