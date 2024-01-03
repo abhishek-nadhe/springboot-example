@@ -47,6 +47,7 @@ jobs:
       - name: Get Image from S3 bucket and push it to ECR 
         run: |
             sh ./push_to_ecr.sh
+        shell: bash
   deploy:
     needs: build
     runs-on: [ubuntu-latest]
@@ -59,7 +60,6 @@ jobs:
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
       - name: Login to Amaszon ECR
         run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
-        shell: bash
       - name: SSH into EC2 and Deploy
         env: 
           ECR_REPO_URL: ${{ secrets.ECR_REPO_URL }}
