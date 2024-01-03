@@ -8,6 +8,7 @@ TAG="latest"
 S3_BUCKET="demo-bucket-spring"
 S3_PATH="docker_images"
 
+cd "$(dirname "$(dirname "$0")")"
 # Build Docker image
 docker build -t "${IMAGE_NAME}:${TAG}" .
 
