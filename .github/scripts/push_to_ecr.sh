@@ -13,9 +13,9 @@ DOCKER_IMAGE_NAME="springboot"
 ECR_REGION="$AWS_DEFAULT_REGION"
 ECR_ACCOUNT_ID="$AWS_ACCOUNT_ID"
 ECR_REPOSITORY_NAME="kampdevecr"
-ECR_TAG="springboot-latest123"
+ECR_TAG="springboot"
 
-#Download the Docker image from S3
+# Download the Docker image from S3
 aws s3 cp "s3://${S3_BUCKET}/${S3_PATH}/${DOCKER_IMAGE_NAME}.tar.gz" "${GITHUB_WORKSPACE}/${DOCKER_IMAGE_NAME}.tar.gz"
 
 #Load the Docker image
@@ -23,13 +23,13 @@ docker load -i "${GITHUB_WORKSPACE}/${DOCKER_IMAGE_NAME}.tar.gz"
 
 echo "Loaded image ID: $(docker images -q ${DOCKER_IMAGE_NAME}:latest)"
 
-aws ecr get-login-password --region "${ECR_REGION}" | docker login --username AWS --password-stdin "${ECR_ACCOUNT_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com"
+aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
 
-ECR_REPOSITORY_URI="${ECR_ACCOUNT_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME}"
+# docker tag "${DOCKER_IMAGE_NAME}:latest" "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/${ECR_REPOSITORY_NAME}:${ECR_TAG}"
+docker tag kampdevecr:latest ${ECR_REPO_URL}:springboot-latest
 
-docker tag "${DOCKER_IMAGE_NAME}:latest" "${ECR_REPOSITORY_URI}:${ECR_TAG}"
-
-docker push "${ECR_REPOSITORY_URI}:${ECR_TAG}"
+# docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/${ECR_REPOSITORY_NAME}:${ECR_TAG}"
+docker push ${ECR_REPO_URL}:springboot-latest
 
 docker rmi "${DOCKER_IMAGE_NAME}:latest"
 
