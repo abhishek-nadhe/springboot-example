@@ -5,13 +5,18 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+  workflow_dispatch:
+      inputs:
+        environment:
+          description: 'Environment to deploy to'
+          required: true
     
-env:
-  AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  PRIVATE_SSH_KEY: ${{ secrets.AWS_KAMP_EC2_IP }}
-  SERVER_PUBLIC_IP: ${{ secrets.AWS_PUBLIC_KEY }}
+# env:
+#   AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+#   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#   PRIVATE_SSH_KEY: ${{ secrets.AWS_KAMP_EC2_IP }}
+#   SERVER_PUBLIC_IP: ${{ secrets.AWS_PUBLIC_KEY }}
   
 jobs:
   build:
@@ -34,26 +39,27 @@ jobs:
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
       - name: Login to Amazon ECR
         run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
-      # - name: Build, tag, and push image to Amazon ECR
-      #   run: |
-      #     echo "ECR Registry: $ECR_REGISTRY/$ECR_REPOSITORY"
-      #     docker build -t kampdevecr .
-      #     docker tag kampdevecr:latest ${{ secrets.ECR_REPO_URL }}:springboot-latest
-      #     docker push ${{ secrets.ECR_REPO_URL }}:springboot-latest
-      - name: Build and Upload Docker Image
+      - name: Build, tag, and push image to Amazon ECR
+        run: |
+          echo "ECR Registry: $ECR_REGISTRY/$ECR_REPOSITORY"
+          docker build -t kampdevecr .
+          docker tag kampdevecr:latest ${{ secrets.ECR_REPO_URL }}:springboot-latest
+          docker push ${{ secrets.ECR_REPO_URL }}:springboot-latest
+      - name: Build and Upload Docker Image to S3 Bucket
         run: |
             sh ./build_and_upload.sh
         shell: bash
-      - name: Get Image from S3 bucket and push it to ECR 
-        run: |
-            sh ./push_to_ecr.sh
-            docker tag springboot:latest ${{ secrets.ECR_REPO_URL }}:springboot-latest123
-            docker push ${{ secrets.ECR_REPO_URL }}:springboot-latest123
-            echo "Docker image has been pushed to ECR successfully!"
-        shell: bash
+      # - name: Get Image from S3 bucket and push it to ECR 
+      #   run: |
+      #       sh ./push_to_ecr.sh
+      #       docker tag springboot:latest ${{ secrets.ECR_REPO_URL }}:springboot-latest123
+      #       docker push ${{ secrets.ECR_REPO_URL }}:springboot-latest123
+      #       echo "Docker image has been pushed to ECR successfully!"
+      #   shell: bash
   deploy:
     needs: build
     runs-on: [ubuntu-latest]
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev'
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -63,6 +69,43 @@ jobs:
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
       - name: Login to Amaszon ECR
         run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+      - name: SSH into EC2 and Deploy
+        env: 
+          ECR_REPO_URL: ${{ secrets.ECR_REPO_URL }}
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AWS_KAMP_EC2_IP }}
+          username: ${{ secrets.AWS_KAMP_EC2_USER }}
+          key: ${{ secrets.PRIVATE_KEY_PEM }}
+          script: |
+            #!/bin/bash
+            aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws configure set default.region ${{ secrets.AWS_DEFAULT_REGION }}
+            # Authenticate Docker with ECR
+            aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
+            docker pull ${{ secrets.ECR_REPO_URL }}:springboot-latest
+            docker run -d -p 8080:8080 --name springboot-latest ${{ secrets.ECR_REPO_URL }}:springboot-latest
+  deploy-from-s3-bucket:
+    needs: build
+    runs-on: [ubuntu-latest]
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev'
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+      - name: Login to Amaszon ECR
+        run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+      - name: Get Image from S3 bucket and push it to ECR 
+        run: |
+            sh ./push_to_ecr.sh
+            docker tag springboot:latest ${{ secrets.ECR_REPO_URL }}:springboot-latest123
+            docker push ${{ secrets.ECR_REPO_URL }}:springboot-latest123
+            echo "Docker image has been pushed to ECR successfully!"
+        shell: bash
       - name: SSH into EC2 and Deploy
         env: 
           ECR_REPO_URL: ${{ secrets.ECR_REPO_URL }}
