@@ -49,8 +49,7 @@ jobs:
             sh ./push_to_ecr.sh
             docker tag springboot:latest ${{ secrets.ECR_REPO_URL }}:springboot-latest123
             docker push ${{ secrets.ECR_REPO_URL }}:springboot-latest123
-            docker rmi "${DOCKER_IMAGE_NAME}:latest"
-            echo "Docker image ${DOCKER_IMAGE_NAME} has been pushed to ECR successfully!"
+            echo "Docker image has been pushed to ECR successfully!"
         shell: bash
   deploy:
     needs: build
