@@ -1,21 +1,16 @@
 name: Java CICD
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
   workflow_dispatch:
-    
-# env:
-#   AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-#   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#   PRIVATE_SSH_KEY: ${{ secrets.AWS_KAMP_EC2_IP }}
-#   SERVER_PUBLIC_IP: ${{ secrets.AWS_PUBLIC_KEY }}
+    inputs:
+      job:
+        description: 'The job to run'
+        required: true
+
   
 jobs:
   build:
+    if: ${{ github.event.inputs.job == 'build' }}
     runs-on: [ubuntu-latest]
     steps:
       - name: Checkout source
@@ -54,8 +49,8 @@ jobs:
       #   shell: bash
   deploy:
     needs: build
+    if: ${{ github.event.inputs.job == 'deploy' }}
     runs-on: [ubuntu-latest]
-    if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
@@ -104,7 +99,7 @@ jobs:
   deploy-from-s3-bucket:
     needs: build
     runs-on: [ubuntu-latest]
-    if: github.event_name == 'workflow_dispatch'
+    if: ${{ github.event.inputs.job == 'deploy-from-s3-bucket' }}
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
